@@ -188,13 +188,56 @@ app.get('/shop',shopMiddleWare,(req,res)=>{
 
 ---
 
-## ❌ Error Handling Middleware
+##  Error Handling Middleware
 
+# Create Error
 ```js
-app.use((err, req, res, next) => {
-  res.status(500).send("Something went wrong!");
+app.get('/error',(req,res,next)=>{
+    const err = new Error("Error created");
+    next(err);
 });
 ```
+# Handle Error
+```js
+app.use((err,req,res,next)=>{
+    res.status(500).json({
+        success:false,
+        message:err.message
+    });
+});
+```
+
+# Output
+
+<img width="955" height="209" alt="image" src="https://github.com/user-attachments/assets/1ad25ab6-d705-4360-9c2e-28b6da0dd651" />
+
+
+# Create Fake Authentication Middleware
+// Create a middleware that checks a fake condition:
+
+// 👉 Example logic idea:
+// if user is "loggedIn = true" → allow
+// else → block
+// Apply it only on /dashboard
+
+const checkAuthenticate = (req,res,next)=>{
+    const isLoggedIn = req.query.loggedIn;
+    if(isLoggedIn === 'true'){
+        console.log("Access granted");
+        next();
+    }
+    else{
+        console.log("Access denied.");
+         res.status(401).json({ message: "Access denied. Please log in." }); 
+    }
+    
+};
+app.get('/dashboard',checkAuthenticate,(req,res)=>{
+    res.json({
+        message:'Welcome to our system.'
+    });
+});
+
 
 ---
 
