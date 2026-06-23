@@ -213,13 +213,8 @@ app.use((err,req,res,next)=>{
 
 
 # Create Fake Authentication Middleware
-// Create a middleware that checks a fake condition:
 
-// 👉 Example logic idea:
-// if user is "loggedIn = true" → allow
-// else → block
-// Apply it only on /dashboard
-
+```js
 const checkAuthenticate = (req,res,next)=>{
     const isLoggedIn = req.query.loggedIn;
     if(isLoggedIn === 'true'){
@@ -237,27 +232,90 @@ app.get('/dashboard',checkAuthenticate,(req,res)=>{
         message:'Welcome to our system.'
     });
 });
-
-
----
-
-## 📁 Static Files
-
-```js
-app.use(express.static("public"));
 ```
 
+# Output
+
+<img width="956" height="144" alt="image" src="https://github.com/user-attachments/assets/065b7546-cf30-4415-8540-b20767a88d06" />
+
+# Multiple Error Routes handle with single Middleware
+
+```js
+app.get('/error1',(req,res,next)=>{
+    const err = new Error("error 1 created");
+    err.status=400;
+    next(err);
+});
+
+app.get('/error2',(req,res,next)=>{
+    const err = new Error("error 2 created");
+    err.status=402;
+    next(err);
+});
+
+app.get('/error3',(req,res,next)=>{
+    const err = new Error("error 3 created");
+    err.status=404;
+    next(err);
+});
+
+app.use((err,req,res,next)=>{
+    console.log('central error handler');
+    const ErrorFound = err.status || 500;
+    res.status(ErrorFound).json({
+        success:false,
+        errorMessage:err.message,
+        errorStatus:ErrorFound
+
+    });
+
+});
+```
+# Output
+
+* Error Route 3
+<img width="957" height="133" alt="image" src="https://github.com/user-attachments/assets/528a65c8-235f-431e-a92c-d23b265d546f" />
+* Error Route 2
+<img width="954" height="157" alt="image" src="https://github.com/user-attachments/assets/7f2f3f1d-ef07-495f-bba2-44cfd0a76cc6" />
+* Error Route 1
+<img width="954" height="118" alt="image" src="https://github.com/user-attachments/assets/8767fc21-f586-4c6a-984f-22e582340471" />
+
+
+
 ---
 
-## 🌐 REST API (GET & POST)
+##  Static Files
+
+```js
+app.use(express.static('frontend'));
+```
+
+# Output
+
+<img width="960" height="348" alt="image" src="https://github.com/user-attachments/assets/46b5dde8-93aa-404e-bab3-c5c55d7ed106" />
+
+
+---
+
+##  REST API (GET & POST)
 
 ### GET Request
 
 ```js
-app.get("/items", (req, res) => {
-  res.json(["item1", "item2"]);
+app.use((req,res,next)=>{
+    console.log(`Request Method: ${req.method}`);
+    console.log(`Request URL: ${req.url}`);
+    next();
 });
 ```
+
+# Output
+* Display the method and url of the route get executed
+
+<img width="373" height="70" alt="image" src="https://github.com/user-attachments/assets/07ef1293-428d-4b81-ba9d-d66d163dec3a" />
+
+# Get Method
+* It's already show above...
 
 ---
 
@@ -266,17 +324,31 @@ app.get("/items", (req, res) => {
 This is a basic POST request just to understand how data is sent to the server.
 
 ```js
-app.use(express.json());
+app.post('/student',(req,res)=>{
+    console.log("added a new record");
+    const newStudent ={
+        id:students.length+1,
+        name:req.body.name
+    }
+    students.push(newStudent);
+    res.status(201).json(newStudent);
 
-app.post("/data", (req, res) => {
-  console.log(req.body);
-  res.status(201).send("Data received successfully");
 });
 ```
 
+# Output
+
+* Send Data from the React
+<img width="907" height="60" alt="image" src="https://github.com/user-attachments/assets/43030a1f-8515-4896-9956-6486223090a0" />
+
+* After receiving new student, the student array append the new record using the POST methid and send response back to frontend
+<img width="864" height="124" alt="image" src="https://github.com/user-attachments/assets/e1087816-c244-4bfc-9a87-7dd7a355fcf4" />
+* Updating array API
+<img width="960" height="143" alt="image" src="https://github.com/user-attachments/assets/36c90179-53bf-49e0-9418-4432331cf77a" />
+
 ---
 
-## 📌 HTTP Status Codes Used
+##  HTTP Status Codes Used
 
 * `200` → OK
 * `201` → Created
@@ -286,10 +358,3 @@ app.post("/data", (req, res) => {
 * `404` → Not Found
 * `500` → Server Error
 
----
-
-If you want next step, I can also:
-
-* convert this into a **real folder-based Express project**
-* or add **Postman collection for testing APIs**
-* or help you deploy it on **Render / Vercel / Railway**
