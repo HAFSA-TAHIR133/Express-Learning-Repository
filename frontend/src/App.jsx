@@ -47,14 +47,14 @@ function App() {
         </p>
       ))}
 
-      <hr />
+      {/* <hr /> */}
       <h2>Enter New Student Name</h2>
       <input type="text" placeholder="Enter name" value={newStudent} 
       onChange={(e)=>setNewStudent(e.target.value)} />
       <button onClick={AddNewstudent}>Click to add</button>
 
-
-      <h2>Student ID</h2>
+      <hr />
+      <h2>Enter Student ID</h2>
       <StudentID />
       <Course />
       <SearchQuery />
